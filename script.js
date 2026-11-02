@@ -7,7 +7,7 @@
 
   function sheetUrl(name) {
     return "https://docs.google.com/spreadsheets/d/" + GOOGLE_SHEET_ID +
-      "/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent(name);
+      "/gviz/tq?tqx=out:csv&headers=1&sheet=" + encodeURIComponent(name); // headers=1: заголовок ровно одна строка
   }
 
   // Разбор CSV с учётом кавычек и переносов строк внутри ячеек
@@ -146,6 +146,13 @@
     }
   }
 
+  // В таблице цену можно написать просто числом: 2800 → «2 800 ₽»
+  function money(s) {
+    s = (s || "").trim();
+    if (!/^\d[\d\s]*$/.test(s)) return s;
+    return s.replace(/\s/g, "").replace(/\B(?=(\d{3})+$)/g, " ") + " ₽";
+  }
+
   function visibleServices(services) {
     return services.filter(function (r) {
       return r[1] && r[1].trim() && (r[4] || "").trim().toLowerCase() !== "нет";
@@ -182,7 +189,7 @@
         '<div class="price__rows">' + byCat[g].map(function (r, i) {
           return '<div class="row" style="--i:' + Math.min(i, 12) + '"><div class="row__top">' +
             '<span class="row__name">' + esc(r[1]) + '</span><i class="row__dots"></i>' +
-            '<span class="row__price">' + esc(r[3] || "") + "</span></div>" +
+            '<span class="row__price">' + esc(money(r[3])) + "</span></div>" +
             (r[2] ? '<div class="row__desc">' + esc(r[2]) + "</div>" : "") + "</div>";
         }).join("") + "</div></div>";
     }).join("");
@@ -198,7 +205,7 @@
     document.querySelectorAll("[data-count-word]").forEach(function (el) { el.textContent = plural(count, "направление", "направления", "направлений"); });
     var gift = visible.filter(function (r) { return /сертификат/i.test(r[1]); })[0];
     var giftEl = document.getElementById("gift-price");
-    if (gift && gift[3]) giftEl.textContent = gift[3];
+    if (gift && gift[3]) giftEl.textContent = money(gift[3]);
   }
 
   // Бегущая строка повторяет категории прайса: половина ленты — копия другой
