@@ -110,14 +110,12 @@
   function fillLinks(info) {
     var phone = (info["Телефон"] || "").replace(/[^\d+]/g, "");
     var tg = (info["Telegram"] || "").replace(/^@/, "");
-    var wa = (info["WhatsApp"] || "").replace(/\D/g, "");
     var addr = info["Адрес"];
     var geo = (info["Координаты"] || "").split(",").map(parseFloat);
     var hasGeo = geo.length === 2 && !isNaN(geo[0]) && !isNaN(geo[1]);
     var links = {
       phone: phone && "tel:" + phone,
       vk: info["ВКонтакте"],
-      whatsapp: wa && "https://wa.me/" + wa,
       telegram: tg && (tg.indexOf("http") === 0 ? tg : "https://t.me/" + tg),
       map: hasGeo ? "https://yandex.ru/maps/?pt=" + geo[1] + "," + geo[0] + "&z=18&l=map" :
         addr && "https://yandex.ru/maps/?text=" + encodeURIComponent(addr),
